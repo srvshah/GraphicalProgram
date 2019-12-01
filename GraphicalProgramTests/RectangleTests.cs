@@ -8,10 +8,17 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgram.Tests
 {
+    /// <summary>
+    /// Tests Rectangle Class
+    /// </summary>
     [TestClass()]
     public class RectangleTests
     {
         Rectangle r = new Rectangle();
+
+        /// <summary>
+        /// Tests whether the value passed to the set method sets the variables to the given value
+        /// </summary>
         [TestMethod()]
         public void setTest()
         {

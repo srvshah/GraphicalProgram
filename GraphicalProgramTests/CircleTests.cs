@@ -8,12 +8,17 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgram.Tests
 {
-    
+    /// <summary>
+    /// Tests the Circle Class
+    /// </summary>
     [TestClass()]
     public class CircleTests
     {
         Circle c = new Circle();
 
+        /// <summary>
+        /// Tests whether the value passed to the set method sets the variables to the given value
+        /// </summary>
         [TestMethod()]
         public void setTest()
         {

@@ -11,10 +11,12 @@ namespace GraphicalProgram
     {
         public int Radius { get; set; }
         public int X { get; set; }
-        public int Y { get; set; }
+        public int Y { get; set; }      
         
-        
-
+        /// <summary>
+        /// takes Graphics object and draws and ellipse with provided parameters
+        /// </summary>
+        /// <param name="g"></param>
         public void draw(Graphics g)
         {
             Pen p = new Pen(Color.Black);
@@ -22,6 +24,10 @@ namespace GraphicalProgram
             p.Dispose();
         }
 
+        /// <summary>
+        /// takes integer array as argument, sets the provided arguments to the variables
+        /// </summary>
+        /// <param name="list"></param>
         public void set(params int[] list)
         {
             X = list[0];

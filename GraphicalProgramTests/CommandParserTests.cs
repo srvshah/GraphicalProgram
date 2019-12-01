@@ -9,12 +9,18 @@ using System.Drawing;
 
 namespace GraphicalProgram.Tests
 {
+    /// <summary>
+    /// Tests Command Parser Class
+    /// </summary>
     [TestClass()]
     public class CommandParserTests
     {
         CommandParser cp = new CommandParser();
         Form1 form = new Form1();
 
+        /// <summary>
+        /// Tests whether the commands given by input are valid or not
+        /// </summary>
         [TestMethod()]
         public void validateCommandTest()
         {
@@ -32,6 +38,9 @@ namespace GraphicalProgram.Tests
             }
         }
 
+        /// <summary>
+        /// Tests whether the command is executed correctly
+        /// </summary>
         [TestMethod()]
         public void executeCommandTest()
         {
@@ -48,6 +57,9 @@ namespace GraphicalProgram.Tests
             Assert.AreEqual(expectedY, cp.Y);
         }
 
+        /// <summary>
+        /// Tests whether the pen resets back to (0,0) or not
+        /// </summary>
         [TestMethod()]
         public void resetPenTest()
         {
@@ -62,6 +74,9 @@ namespace GraphicalProgram.Tests
             Assert.AreEqual(expected, actual);
         }
 
+        /// <summary>
+        /// Tests whether the pen position is moved to given co-ordinate
+        /// </summary>
         [TestMethod()]
         public void moveToTest()
         {

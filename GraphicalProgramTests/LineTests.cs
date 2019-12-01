@@ -8,11 +8,17 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgram.Tests
 {
+    /// <summary>
+    /// Tests the Line Class
+    /// </summary>
     [TestClass()]
     public class LineTests
     {
         Line ln = new Line();
 
+        /// <summary>
+        /// Tests whether the value passed to the set method sets the variables to the given value
+        /// </summary>
         [TestMethod()]
         public void setTest()
         {

@@ -17,7 +17,12 @@ namespace GraphicalProgram
         public int X { get; set; }
         public int Y { get; set; }
 
-
+        /// <summary>
+        /// takes a string, checks if it is a valid command
+        /// </summary>
+        /// <param name="userInput"></param>
+        /// <param name="message"></param>
+        /// <returns>returns a boolean value, and message as output parameter</returns>
         public bool validateCommand(string userInput, out string message)
         {
             if (string.IsNullOrEmpty(userInput))
@@ -104,7 +109,10 @@ namespace GraphicalProgram
             return true;
         }
 
-
+        /// <summary>
+        /// iterates through parameters array and checks if they are integers
+        /// </summary>
+        /// <returns>boolean</returns>
         private bool validParameters()
         {
             foreach (var p in parameters)
@@ -117,6 +125,11 @@ namespace GraphicalProgram
             return true;
         }
 
+        /// <summary>
+        /// executes what is stored in the command variable using the parameters stored in parameters array
+        /// </summary>
+        /// <param name="g"></param>
+        /// <returns>co-ordinate of the current pen position as a Point</returns>
         public Point executeCommand(Graphics g)
         {
             Pen p = new Pen(Color.Black);
@@ -162,11 +175,13 @@ namespace GraphicalProgram
             return new Point(X, Y);
         }
 
+        /// <summary>
+        /// resets the Pen co-ordinates to (0,0)
+        /// </summary>
+        /// <returns>value of X and Y as a Point</returns>
         public Point resetPen()
         {
-            X = 0;
-            Y = 0;
-            return new Point(X, Y);
+            return new Point(X = 0, Y = 0);
         }
 
         public void moveTo(int x, int y)

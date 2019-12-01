@@ -9,11 +9,17 @@ using System.Drawing;
 
 namespace GraphicalProgram.Tests
 {
+    /// <summary>
+    /// Tests the Triangle Class
+    /// </summary>
     [TestClass()]
     public class TriangleTests
     {
         Triangle t = new Triangle();
-        
+
+        /// <summary>
+        /// Tests whether the value passed to the set method sets the variables to the given value
+        /// </summary>
         [TestMethod()]
         public void setTest()
         {

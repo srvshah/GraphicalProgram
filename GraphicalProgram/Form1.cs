@@ -134,5 +134,10 @@ namespace GraphicalProgram
                 Application.Exit();
             }
         }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("A Graphical Programming Application which allows a user to draw shapes using programming language concepts including encapsulation, conditionals and iteration. \n\n Copyright (c) 2019. All rights Reserved. \n\n Saurab Bikram Shah");
+        }
     }
 }
