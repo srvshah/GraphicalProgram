@@ -13,6 +13,10 @@ namespace GraphicalProgram
         public int Y { get; set; }
         public Point[] point = new Point[3];
 
+        /// <summary>
+        /// draws Triangle
+        /// </summary>
+        /// <param name="g"></param>
         public void draw(Graphics g)
         {
             Pen p = new Pen(Color.Black);
@@ -20,6 +24,10 @@ namespace GraphicalProgram
             p.Dispose();
         }
 
+        /// <summary>
+        /// sets the parameter 
+        /// </summary>
+        /// <param name="list"></param>
         public void set(params int[] list)
         {
             X = list[0];

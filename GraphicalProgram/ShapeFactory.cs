@@ -8,8 +8,14 @@ namespace GraphicalProgram
 {
     class ShapeFactory
     {
+        /// <summary>
+        /// returns an object of Shape type according to user input
+        /// </summary>
+        /// <param name="shapeType"></param>
+        /// <returns>Shape Object</returns>
         public IShape getShape(String shapeType)
         {
+            // for case insensitivity
             shapeType = shapeType.ToUpper().Trim();
 
             if(shapeType == null)
@@ -36,13 +42,7 @@ namespace GraphicalProgram
             }
             return null;
 
-            //else
-            //{
-
-            //    //If this is reached then what has been passed is not recognised. A user friendly exception was thrown.
-            //    System.ArgumentException argEx = new System.ArgumentException("Shape Factory error: " + shapeType + " does not exist");
-            //    throw argEx;
-            //}
+          
         }
     }
 }

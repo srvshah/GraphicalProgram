@@ -14,6 +14,10 @@ namespace GraphicalProgram
         public int toX { get; set; }
         public int toY { get; set; }
 
+        /// <summary>
+        /// Draws an Ellipse
+        /// </summary>
+        /// <param name="g"></param>
         public void draw(Graphics g)
         {
             Pen p = new Pen(Color.Black);
@@ -21,6 +25,10 @@ namespace GraphicalProgram
             p.Dispose();
         }
 
+        /// <summary>
+        /// sets the parameter
+        /// </summary>
+        /// <param name="list"></param>
         public void set(params int[] list)
         {
             X = list[0];
