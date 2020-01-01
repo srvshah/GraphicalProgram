@@ -44,23 +44,35 @@ namespace GraphicalProgram
 
         private void btnExecute_Click(object sender, EventArgs e)
         {
-            int lineCount = txtMultiCommand.Lines.Count();
+            List<string> MultiCommands = new List<string>();
+
+            foreach (var item in txtMultiCommand.Lines)
+            {
+                if (!string.IsNullOrEmpty(item))
+                {
+                    MultiCommands.Add(item);
+                }
+            }
+            
+            int lineCount = MultiCommands.Count();
 
             if (lineCount == 0)
             {
-                //MessageBox.Show("Nothing to execute");
                 rtxtLogs.Text = "Nothing to execute";
             }
 
             for (int i = 0; i < lineCount; i++)
             {
-                string error = processCommands(txtMultiCommand.Lines[i]);
+                string error = processCommands(MultiCommands[i]);
 
                 if (!string.IsNullOrEmpty(error))
                 {
-                    //MessageBox.Show($"Error at  Line {i + 1} \n {error}");
                     rtxtLogs.Text = $"Error at  Line {i + 1} \n {error}";
                     break;
+                }
+                else
+                {
+                    rtxtLogs.Text = string.Empty;
                 }
             }
             txtPenPosition.Text = penPosition.ToString();

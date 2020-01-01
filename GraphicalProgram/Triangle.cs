@@ -32,10 +32,16 @@ namespace GraphicalProgram
         {
             X = list[0];
             Y = list[1];
+
+            // adding y to first point
             point[0].X = X;
             point[0].Y = Y + list[2];
+
+            // adding x to second point
             point[1].X = X + list[3];
             point[1].Y = Y;
+
+            // adding x and y to third point
             point[2].X = X + list[3];
             point[2].Y = Y + list[4];
             

@@ -10,7 +10,7 @@ namespace GraphicalProgram
     public class CommandParser
     {
         ShapeFactory sf = new ShapeFactory();
-        private string[] validCommands = { "circle", "rectangle", "triangle", "moveto", "drawto" };
+        private string[] validCommands = { "circle", "rectangle", "triangle", "moveto", "drawto","radius"};
         private string command;
         private string[] parameters;
 
@@ -33,14 +33,14 @@ namespace GraphicalProgram
 
             string[] input = userInput.Trim().ToLower().Split(' ');
 
-            if (input.Length != 2)
-            {
-                message = "Invalid syntax. Use this: \"command <params>\" where parameters are separated by comma. Only Single spaced commands are supported currently";
-                return false;
-            }
+            // should support 
+            //if (input.Length != 2)
+            //{
+            //    message = "Invalid syntax. Use this: \"command <params>\" where parameters are separated by comma. Only Single spaced commands are supported currently";
+            //    return false;
+            //}
 
             command = input[0];
-            parameters = input[1].Split(',');
 
             if (!validCommands.Contains(command))
             {
@@ -50,6 +50,15 @@ namespace GraphicalProgram
 
             else if (command.Equals("moveto") || command.Equals("drawto") || command.Equals("rectangle"))
             {
+
+                if (!CheckInputLength(input,2))
+                {
+                    message = $"{command} takes exactly 2 inputs on the same line";
+                    return false;
+                }
+
+                parameters = input[1].Split(',');
+
                 if (parameters.Length != 2)
                 {
                     message = $"{command} takes 2 parameters";
@@ -69,6 +78,15 @@ namespace GraphicalProgram
 
             else if (command.Equals("triangle"))
             {
+
+                if (!CheckInputLength(input, 2))
+                {
+                    message = $"{command} takes exactly 2 inputs on the same line";
+                    return false;
+                }
+
+                parameters = input[1].Split(',');
+
                 if (parameters.Length != 3)
                 {
                     message = $"{command} takes 3 parameters";
@@ -88,9 +106,49 @@ namespace GraphicalProgram
 
             else if (command.Equals("circle"))
             {
+                if (!CheckInputLength(input, 2))
+                {
+                    message = $"{command} takes exactly 2 inputs on the same line";
+                    return false;
+                }
+
+                parameters = input[1].Split(',');
+
                 if (parameters.Length != 1)
                 {
                     message = $"{command} takes 1 parameter";
+                    return false;
+                }
+
+                else
+                {
+                    if (!validParameters())
+                    {
+                        message = $"Invalid parameter. Use this format: \"{command} x\" where x is an integer";
+                        return false;
+                    }
+
+                }
+            }
+            else if (command.Equals("radius"))
+            {
+                if (!CheckInputLength(input, 3))
+                {
+                    message = $"{command} takes exactly 3 inputs on the same line";
+                    return false;
+                }
+
+                if(!input[1].Equals("="))
+                {
+                    message = "Invalid Syntax";
+                    return false;
+                }
+
+                parameters = input[2].Split(',');
+
+                if (parameters.Length != 1)
+                {
+                    message = $"{command} takes 1 assignment";
                     return false;
                 }
 
@@ -169,6 +227,9 @@ namespace GraphicalProgram
                     triangle.set(X, Y, paramArr[0], paramArr[1], paramArr[2]);
                     triangle.draw(g);
                     break;
+                case "radius":
+                    int radius = paramArr[0];
+                    break;
 
             }
             p.Dispose();
@@ -182,6 +243,11 @@ namespace GraphicalProgram
         public Point resetPen()
         {
             return new Point(X = 0, Y = 0);
+        }
+
+        public bool CheckInputLength(string[] arr, int requiredLength)
+        {
+            return arr.Length == requiredLength;
         }
 
         public void moveTo(int x, int y)
