@@ -26,11 +26,21 @@ namespace GraphicalProgram
 
         private void btnRun_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(txtCommand.Text))
+            {
+                rtxtLogs.Text = "Command field is empty!";
+                return;
+            }
+
             string error = processCommands(txtCommand.Text);
 
             if (!string.IsNullOrEmpty(error))
             {
                 rtxtLogs.Text = error;
+            }
+            else
+            {
+                rtxtLogs.Text = string.Empty;
             }
             txtPenPosition.Text = penPosition.ToString();
         }
@@ -45,11 +55,29 @@ namespace GraphicalProgram
         private void btnExecute_Click(object sender, EventArgs e)
         {
             List<string> MultiCommands = new List<string>();
+            bool nested = false;
+            string nestedContent = string.Empty;
 
             foreach (var item in txtMultiCommand.Lines)
             {
                 if (!string.IsNullOrEmpty(item))
                 {
+                    if (item.StartsWith("if") || item.StartsWith("loop") || nested)
+                    {
+                        nested = true;
+
+                        nestedContent += $"{item};";
+
+                        if (item.StartsWith("end"))
+                        {
+                            MultiCommands.Add(nestedContent);
+                            nested = false;
+                            nestedContent = string.Empty;
+                            continue;
+                        }
+                        continue;
+                    }
+
                     MultiCommands.Add(item);
                 }
             }
@@ -59,6 +87,7 @@ namespace GraphicalProgram
             if (lineCount == 0)
             {
                 rtxtLogs.Text = "Nothing to execute";
+                return;
             }
 
             for (int i = 0; i < lineCount; i++)

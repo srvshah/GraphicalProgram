@@ -4,15 +4,33 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace GraphicalProgram
 {
     public class CommandParser
     {
         ShapeFactory sf = new ShapeFactory();
-        private string[] validCommands = { "circle", "rectangle", "triangle", "moveto", "drawto","radius"};
+        private string[] validCommands = 
+        { 
+            "circle", 
+            "rectangle", 
+            "triangle", 
+            "moveto", 
+            "drawto", 
+            "radius",
+            "width",
+            "height",
+            "var",
+            "if",
+            "loop",
+        };  
         private string command;
+        private string[] input;
         private string[] parameters;
+        private Dictionary<string, int> variables = new Dictionary<string, int>();
+        private string variableKey;
+        private string[] comparisonOperators = { "=", ">", "<", ">=", "<=" };
 
         public int X { get; set; }
         public int Y { get; set; }
@@ -25,22 +43,8 @@ namespace GraphicalProgram
         /// <returns>returns a boolean value, and message as output parameter</returns>
         public bool validateCommand(string userInput, out string message)
         {
-            if (string.IsNullOrEmpty(userInput))
-            {
-                message = "Command field is empty!";
-                return false;
-            }
 
-            string[] input = userInput.Trim().ToLower().Split(' ');
-
-            // should support 
-            //if (input.Length != 2)
-            //{
-            //    message = "Invalid syntax. Use this: \"command <params>\" where parameters are separated by comma. Only Single spaced commands are supported currently";
-            //    return false;
-            //}
-
-            command = input[0];
+            command = userInput.Trim().ToLower().Split(' ')[0];
 
             if (!validCommands.Contains(command))
             {
@@ -50,8 +54,9 @@ namespace GraphicalProgram
 
             else if (command.Equals("moveto") || command.Equals("drawto") || command.Equals("rectangle"))
             {
+                input = userInput.Trim().ToLower().Split(' ');
 
-                if (!CheckInputLength(input,2))
+                if (!CheckInputLength(input, 2))
                 {
                     message = $"{command} takes exactly 2 inputs on the same line";
                     return false;
@@ -67,10 +72,16 @@ namespace GraphicalProgram
 
                 else
                 {
-                    if (!validParameters())
+                    if (!validateInteger())
                     {
-                        message = $"Invalid parameter. Use this format: \"{command} x,x\" where x is an integer";
-                        return false;
+
+                        if (!MapVariablesToParameters(out string error))
+                        {
+                            message = error;
+                            return false;
+                        }
+                        //message = $"Invalid parameter. Use this format: \"{command} x,x\" where x is an integer";
+                        //return false;
                     }
 
                 }
@@ -78,7 +89,7 @@ namespace GraphicalProgram
 
             else if (command.Equals("triangle"))
             {
-
+                input = userInput.Trim().ToLower().Split(' ');
                 if (!CheckInputLength(input, 2))
                 {
                     message = $"{command} takes exactly 2 inputs on the same line";
@@ -95,7 +106,7 @@ namespace GraphicalProgram
 
                 else
                 {
-                    if (!validParameters())
+                    if (!validateInteger())
                     {
                         message = $"Invalid parameter. Use this format: \"{command} x,x,x\" where x is an integer";
                         return false;
@@ -106,6 +117,7 @@ namespace GraphicalProgram
 
             else if (command.Equals("circle"))
             {
+                input = userInput.Trim().ToLower().Split(' ');
                 if (!CheckInputLength(input, 2))
                 {
                     message = $"{command} takes exactly 2 inputs on the same line";
@@ -113,6 +125,7 @@ namespace GraphicalProgram
                 }
 
                 parameters = input[1].Split(',');
+
 
                 if (parameters.Length != 1)
                 {
@@ -122,29 +135,36 @@ namespace GraphicalProgram
 
                 else
                 {
-                    if (!validParameters())
+                    if (!validateInteger())  // check if the parameters are integers
                     {
-                        message = $"Invalid parameter. Use this format: \"{command} x\" where x is an integer";
-                        return false;
+                        // if not interger then try to look for their values in the variables list
+                        if (!MapVariablesToParameters(out string error))
+                        {
+                            message = error;
+                            return false;
+                        }
+                        //message = $"Invalid parameter. Use this format: \"{command} x\" where x is an integer";
+                        //return false;
                     }
-
                 }
             }
-            else if (command.Equals("radius"))
+
+            else if (command.Equals("var"))
             {
-                if (!CheckInputLength(input, 3))
+                input = userInput.Trim().ToLower().Split(' ');
+                if (!CheckInputLength(input, 4))
                 {
-                    message = $"{command} takes exactly 3 inputs on the same line";
+                    message = $"{command} takes exactly 4 inputs on the same line";
                     return false;
                 }
 
-                if(!input[1].Equals("="))
+                if (!input[2].Equals("="))
                 {
-                    message = "Invalid Syntax";
+                    message = "Invalid Syntax: User '=' operator to assign a variable";
                     return false;
                 }
 
-                parameters = input[2].Split(',');
+                parameters = input[3].Split(',');
 
                 if (parameters.Length != 1)
                 {
@@ -154,15 +174,52 @@ namespace GraphicalProgram
 
                 else
                 {
-                    if (!validParameters())
+                    if (!validateInteger())
                     {
                         message = $"Invalid parameter. Use this format: \"{command} x\" where x is an integer";
                         return false;
                     }
 
                 }
+                variableKey = input[1];
             }
 
+            else if (command.Equals("if"))
+            {
+
+                input = userInput.Trim().ToLower().Split(';');
+                
+                bool condition = false;
+
+                string[] conditionString = input[0].Split(' ');
+
+                if (conditionString[1].ToLower().Equals("true"))
+                    condition = true;
+                else if (conditionString[1].ToLower().Equals("false"))
+                    condition = false;
+
+
+
+                if (!comparisonOperators.Contains(conditionString[2]))
+                {
+                    message = "Error: Invalid Operator";
+                    return false;
+                }
+
+
+
+                string test = "";
+                foreach (var item in input)
+                {
+                    test += item+"\n";
+                }
+
+                MessageBox.Show(test);
+
+
+                message = "null";
+                return false;
+            }
             message = null;
             return true;
         }
@@ -171,7 +228,7 @@ namespace GraphicalProgram
         /// iterates through parameters array and checks if they are integers
         /// </summary>
         /// <returns>boolean</returns>
-        private bool validParameters()
+        private bool validateInteger()
         {
             foreach (var p in parameters)
             {
@@ -191,6 +248,7 @@ namespace GraphicalProgram
         public Point executeCommand(Graphics g)
         {
             Pen p = new Pen(Color.Black);
+            //int[] paramArr = parameters.Select(x => { int.TryParse(x, out int i); return i; }).ToArray();
             int[] paramArr = parameters.Select(int.Parse).ToArray();
 
             switch (command)
@@ -227,10 +285,20 @@ namespace GraphicalProgram
                     triangle.set(X, Y, paramArr[0], paramArr[1], paramArr[2]);
                     triangle.draw(g);
                     break;
-                case "radius":
-                    int radius = paramArr[0];
+                case "var":
+                    // if it exists on the list
+                    if (variables.ContainsKey(variableKey))
+                    {
+                        // replace it
+                        variables[variableKey] = paramArr[0];
+                    }
+                    // if not
+                    else
+                    {
+                        // add it
+                        variables.Add(variableKey, paramArr[0]);
+                    }
                     break;
-
             }
             p.Dispose();
             return new Point(X, Y);
@@ -245,15 +313,34 @@ namespace GraphicalProgram
             return new Point(X = 0, Y = 0);
         }
 
-        public bool CheckInputLength(string[] arr, int requiredLength)
-        {
-            return arr.Length == requiredLength;
-        }
-
         public void moveTo(int x, int y)
         {
             X = x;
             Y = y;
         }
+
+        public bool CheckInputLength(string[] arr, int requiredLength)
+        {
+            return arr.Length == requiredLength;
+        }
+
+        private bool MapVariablesToParameters(out string message)
+        {
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (variables.ContainsKey(parameters[i]))
+                {
+                    parameters[i] = variables[parameters[i]].ToString();
+                }
+                else
+                {
+                    message = $"{parameters[i]} is not defined";
+                    return false;
+                }
+            }
+            message = null;
+            return true;
+        }
+
     }
 }
