@@ -15,7 +15,7 @@ namespace GraphicalProgram
     {
         public Graphics g { get; }
         CommandParser cp = new CommandParser();
-        Point penPosition = new Point(0, 0);
+        public Point penPosition = new Point(0, 0);
 
         public Form1()
         {
@@ -55,30 +55,15 @@ namespace GraphicalProgram
         private void btnExecute_Click(object sender, EventArgs e)
         {
             List<string> MultiCommands = new List<string>();
-            bool nested = false;
-            string nestedContent = string.Empty;
+            bool insideIf = false;
+            string condition = string.Empty;
+            bool valid = true;
 
-            foreach (var item in txtMultiCommand.Lines)
+            foreach (var command in txtMultiCommand.Lines)
             {
-                if (!string.IsNullOrEmpty(item))
+                if (!string.IsNullOrEmpty(command))
                 {
-                    if (item.StartsWith("if") || item.StartsWith("loop") || nested)
-                    {
-                        nested = true;
-
-                        nestedContent += $"{item};";
-
-                        if (item.StartsWith("end"))
-                        {
-                            MultiCommands.Add(nestedContent);
-                            nested = false;
-                            nestedContent = string.Empty;
-                            continue;
-                        }
-                        continue;
-                    }
-
-                    MultiCommands.Add(item);
+                    MultiCommands.Add(command);
                 }
             }
             
@@ -92,17 +77,55 @@ namespace GraphicalProgram
 
             for (int i = 0; i < lineCount; i++)
             {
-                string error = processCommands(MultiCommands[i]);
+                string cmd = MultiCommands[i];
 
-                if (!string.IsNullOrEmpty(error))
+
+                if (cmd.StartsWith("if"))
                 {
-                    rtxtLogs.Text = $"Error at  Line {i + 1} \n {error}";
-                    break;
+
+                    valid = cp.validateCommand(cmd, out condition);
+
                 }
-                else
+
+                else if (condition.Equals("false") || insideIf)
                 {
-                    rtxtLogs.Text = string.Empty;
+                    insideIf = true;
+                    if (!cmd.StartsWith("end"))
+                    {
+                        continue;
+                    }
+                    insideIf = false;
+                    condition = string.Empty;
                 }
+                else 
+                {
+                    if (cmd.StartsWith("end")) continue;
+
+                    if (valid)
+                    {
+                        string error = processCommands(cmd);
+
+                        if (!string.IsNullOrEmpty(error))
+                        {
+                            rtxtLogs.Text = $"Error at  Line {i + 1} \n {error}";
+                            break;
+                        }
+                        else
+                        {
+                            rtxtLogs.Text = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        rtxtLogs.Text = $"Error at  Line {i + 1} \n {condition}";
+                        break;
+                    }
+
+                   
+
+                }
+
+                
             }
             txtPenPosition.Text = penPosition.ToString();
         }
@@ -119,7 +142,7 @@ namespace GraphicalProgram
         }
 
 
-        private string processCommands(string input)
+        public string processCommands(string input)
         {
             if (cp.validateCommand(input, out string error))
             {

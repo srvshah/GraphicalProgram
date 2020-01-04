@@ -31,6 +31,7 @@ namespace GraphicalProgram
         private Dictionary<string, int> variables = new Dictionary<string, int>();
         private string variableKey;
         private string[] comparisonOperators = { "=", ">", "<", ">=", "<=" };
+        private string myOperator;
 
         public int X { get; set; }
         public int Y { get; set; }
@@ -186,59 +187,101 @@ namespace GraphicalProgram
 
             else if (command.Equals("if"))
             {
-
-                input = userInput.Trim().ToLower().Split(';');
                 
-                bool condition = false;
+                string condition = "false";
 
-                string[] conditionString = input[0].Split(' ');
+                var conditionString = userInput.Trim().ToLower().Split(' ');
 
-                if (conditionString[1].ToLower().Equals("true"))
-                    condition = true;
-                else if (conditionString[1].ToLower().Equals("false"))
-                    condition = false;
-
-
-
-                if (!comparisonOperators.Contains(conditionString[2]))
+                if (conditionString.Length != 2 && conditionString.Length != 4)
                 {
-                    message = "Error: Invalid Operator";
+                    message = "if condition has errors.";
                     return false;
                 }
+               
 
-
-
-                string test = "";
-                foreach (var item in input)
+                if (conditionString[1].ToLower().Equals("true")) condition = "true";                 
+                else if (conditionString[1].ToLower().Equals("false")) condition = "false";
+                else
                 {
-                    test += item+"\n";
+                    if(conditionString.Length == 2)
+                    {
+                        message = "error on if statement";
+                        return false;
+                    }
+                    
+                    parameters = new string[] { conditionString[1], conditionString[3] };
+                    
+
+                    myOperator = conditionString[2];
+                    if (!comparisonOperators.Contains(myOperator))
+                    {
+                        message = "Error: Invalid Operator";
+                        return false;
+                    }
+                    
+                         
+                    if (!validateInteger())
+                    {
+                        if (!MapVariablesToParameters(out string error))
+                        {
+                            message = error;
+                            return false;
+                        }
+                    }
+
+
+                    switch (myOperator)
+                    {
+                        case "=":
+                            condition = int.Parse(parameters[0]) == int.Parse(parameters[1]) ? "true" : "false";
+                            break;
+                        case "<":
+                            condition = int.Parse(parameters[0]) < int.Parse(parameters[1]) ? "true" : "false";
+                            break;
+                        case ">":
+                            condition = int.Parse(parameters[0]) > int.Parse(parameters[1]) ? "true" : "false";
+                            break;
+                        case "<=":
+                            condition = int.Parse(parameters[0]) <= int.Parse(parameters[1]) ? "true" : "false";
+                            break;
+                        case ">=":
+                            condition = int.Parse(parameters[0]) >= int.Parse(parameters[1]) ? "true" : "false";
+                            break;
+                    }
+
                 }
+                message = condition;
+                return true;
 
-                MessageBox.Show(test);
-
-
-                message = "null";
-                return false;
+               
             }
+            else if (command.Equals("loop"))
+            {
+
+                //var input = userInput.Trim().ToLower().Split(' ');
+
+                //bool isInt = int.TryParse(cmd.Split(' ')[1], out counter);
+
+                //if (!isInt)
+                //{
+
+                //    Console.WriteLine("requires integer value");
+
+
+                //}
+                //else
+                //{
+                //    insideLoop = true;
+                //}
+
+            }
+
+
+
             message = null;
             return true;
         }
 
-        /// <summary>
-        /// iterates through parameters array and checks if they are integers
-        /// </summary>
-        /// <returns>boolean</returns>
-        private bool validateInteger()
-        {
-            foreach (var p in parameters)
-            {
-                if (!Int32.TryParse(p, out _))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
 
         /// <summary>
         /// executes what is stored in the command variable using the parameters stored in parameters array
@@ -319,6 +362,23 @@ namespace GraphicalProgram
             Y = y;
         }
 
+
+        /// <summary>
+        /// iterates through parameters array and checks if they are integers
+        /// </summary>
+        /// <returns>boolean</returns>
+        private bool validateInteger()
+        {
+            foreach (var p in parameters)
+            {
+                if (!Int32.TryParse(p, out _))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public bool CheckInputLength(string[] arr, int requiredLength)
         {
             return arr.Length == requiredLength;
@@ -328,7 +388,11 @@ namespace GraphicalProgram
         {
             for (int i = 0; i < parameters.Length; i++)
             {
-                if (variables.ContainsKey(parameters[i]))
+                if (int.TryParse(parameters[i], out int isInt))
+                {
+                    parameters[i] = isInt.ToString();
+                }
+                else if (variables.ContainsKey(parameters[i]))
                 {
                     parameters[i] = variables[parameters[i]].ToString();
                 }
