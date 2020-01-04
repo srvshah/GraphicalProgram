@@ -199,13 +199,13 @@ namespace GraphicalProgram
                 }
                
 
-                if (conditionString[1].ToLower().Equals("true")) condition = "true";                 
-                else if (conditionString[1].ToLower().Equals("false")) condition = "false";
+                if (conditionString[1].Equals("true")) condition = "true";                 
+                else if (conditionString[1].Equals("false")) condition = "false";
                 else
                 {
                     if(conditionString.Length == 2)
                     {
-                        message = "error on if statement";
+                        message = "Error on if statement. The condition can only be true, false or a comparison";
                         return false;
                     }
                     
@@ -258,8 +258,33 @@ namespace GraphicalProgram
             else if (command.Equals("loop"))
             {
 
-                //var input = userInput.Trim().ToLower().Split(' ');
+                var input = userInput.Trim().ToLower().Split(' ');
 
+                if (!CheckInputLength(input, 2))
+                {
+                    message = $"{command} takes exactly 2 inputs on the same line";
+                    return false;
+                }
+                parameters = input[1].Split(',');
+
+                if (parameters.Length != 1)
+                {
+                    message = $"{command} takes 1 parameter";
+                    return false;
+                }
+
+
+                if (!validateInteger()) 
+                {
+                    if (!MapVariablesToParameters(out string error))
+                    {
+                        message = error;
+                        return false;
+                    }
+                }
+
+                message = parameters[0];
+                return true;
                 //bool isInt = int.TryParse(cmd.Split(' ')[1], out counter);
 
                 //if (!isInt)

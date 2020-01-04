@@ -16,6 +16,8 @@ namespace GraphicalProgram
         public Graphics g { get; }
         CommandParser cp = new CommandParser();
         public Point penPosition = new Point(0, 0);
+        bool processingIf = false;
+        bool processingLoop = false;
 
         public Form1()
         {
@@ -55,9 +57,7 @@ namespace GraphicalProgram
         private void btnExecute_Click(object sender, EventArgs e)
         {
             List<string> MultiCommands = new List<string>();
-            bool insideIf = false;
-            string condition = string.Empty;
-            bool valid = true;
+            
 
             foreach (var command in txtMultiCommand.Lines)
             {
@@ -75,57 +75,36 @@ namespace GraphicalProgram
                 return;
             }
 
+           
             for (int i = 0; i < lineCount; i++)
             {
                 string cmd = MultiCommands[i];
 
 
-                if (cmd.StartsWith("if"))
+                if(cmd.Split(' ')[0].Equals("if") || processingIf)
                 {
-
-                    valid = cp.validateCommand(cmd, out condition);
-
+                    if(!processIfCommands(cmd)) break;
                 }
-
-                else if (condition.Equals("false") || insideIf)
+                else if(cmd.Split(' ')[0].Equals("loop") || processingLoop)
                 {
-                    insideIf = true;
-                    if (!cmd.StartsWith("end"))
-                    {
-                        continue;
-                    }
-                    insideIf = false;
-                    condition = string.Empty;
+                    if (!processLoopCommands(cmd)) break;
                 }
-                else 
+                else
                 {
-                    if (cmd.StartsWith("end")) continue;
+                    string error = processCommands(cmd);
 
-                    if (valid)
+                    if (!string.IsNullOrEmpty(error))
                     {
-                        string error = processCommands(cmd);
-
-                        if (!string.IsNullOrEmpty(error))
-                        {
-                            rtxtLogs.Text = $"Error at  Line {i + 1} \n {error}";
-                            break;
-                        }
-                        else
-                        {
-                            rtxtLogs.Text = string.Empty;
-                        }
+                        rtxtLogs.Text = $"Error at  Line {i + 1} \n {error}";
+                        break;
                     }
                     else
                     {
-                        rtxtLogs.Text = $"Error at  Line {i + 1} \n {condition}";
-                        break;
+                        rtxtLogs.Text = string.Empty;
                     }
-
-                   
-
                 }
 
-                
+                                                                                                   
             }
             txtPenPosition.Text = penPosition.ToString();
         }
@@ -141,17 +120,6 @@ namespace GraphicalProgram
             txtPenPosition.Text = penPosition.ToString();
         }
 
-
-        public string processCommands(string input)
-        {
-            if (cp.validateCommand(input, out string error))
-            {
-                penPosition = cp.executeCommand(g);
-                return null;
-            }
-
-            return error;
-        }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -203,5 +171,67 @@ namespace GraphicalProgram
         {
             MessageBox.Show("A Graphical Programming Application which allows a user to draw shapes using programming language concepts including encapsulation, conditionals and iteration. \n\n Copyright (c) 2019. All rights Reserved. \n\n Saurab Bikram Shah");
         }
+
+
+        public string processCommands(string input)
+        {
+            if (cp.validateCommand(input, out string error))
+            {
+                penPosition = cp.executeCommand(g);
+                return null;
+            }
+
+            return error;
+        }
+
+        string condition = string.Empty;
+        private bool processIfCommands(string cmd)
+        {
+            if (cmd.StartsWith("if"))
+            {
+                processingIf = true;
+                if (!cp.validateCommand(cmd, out condition))
+                {
+                    rtxtLogs.Text = $"Error {condition}";
+                    return false;
+                }
+
+            }
+            else if (cmd.StartsWith("end"))
+            {
+                processingIf = false;
+            }
+
+            else 
+            {
+
+                if (condition.Equals("true"))
+                {
+                    string error = processCommands(cmd);
+
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        rtxtLogs.Text = $"Error  {error}";
+                        return false;
+                    }
+                    else
+                    {
+                        rtxtLogs.Text = string.Empty;
+                    }
+                }
+            }
+            return true;
+            
+        }
+
+
+        private bool processLoopCommands(string cmd)
+        {
+            processingLoop = true;
+
+
+            return true;
+        }
+
     }
 }
