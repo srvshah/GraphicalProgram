@@ -106,6 +106,8 @@ namespace GraphicalProgram
 
                                                                                                    
             }
+
+            cp.variables.Clear();
             txtPenPosition.Text = penPosition.ToString();
         }
 
@@ -173,7 +175,7 @@ namespace GraphicalProgram
         }
 
 
-        public string processCommands(string input)
+        public string processCommands(string input) 
         {
             if (cp.validateCommand(input, out string error))
             {
@@ -197,7 +199,7 @@ namespace GraphicalProgram
                 }
 
             }
-            else if (cmd.StartsWith("end"))
+            else if (cmd.StartsWith("endif"))
             {
                 processingIf = false;
             }
@@ -224,12 +226,68 @@ namespace GraphicalProgram
             
         }
 
-
+        int counter = 0;
+        string counterVariable;
+        List<string> LoopStatements = new List<string>();
         private bool processLoopCommands(string cmd)
         {
-            processingLoop = true;
+            if (cmd.StartsWith("loop"))
+            {
+                processingLoop = true;
+                if (!cp.validateCommand(cmd, out string count))
+                {
+                    rtxtLogs.Text = $"Error {count}";
+                    return false;
+                }
+                if(!int.TryParse(count, out counter))
+                {
+                    counterVariable = count;
+                    counter = cp.variables[count];
+                }
+                else
+                {
+                    counter = int.Parse(count);
+                }
 
+            }
+            else if (cmd.StartsWith("endloop"))
+            {
+                
 
+                for (int i = 0; i < (!string.IsNullOrEmpty(counterVariable) ? cp.variables[counterVariable] : counter); i++)
+                {
+                    if (!string.IsNullOrEmpty(counterVariable))
+                    {
+                        cp.variables[counterVariable]++;
+                    }
+                    foreach (var stmt in LoopStatements)
+                    {
+                        string error = processCommands(stmt);
+
+                        if (!string.IsNullOrEmpty(error))
+                        {
+                            rtxtLogs.Text = $"Error  {error}";
+                            return false;
+                        }
+                        else
+                        {
+                            rtxtLogs.Text = string.Empty;
+                        }
+                    }
+                    
+                }
+                processingLoop = false;
+                LoopStatements.Clear();
+                counter = 0;
+                if (!string.IsNullOrEmpty(counterVariable))
+                {
+                    cp.variables.Remove(counterVariable);
+                }
+            }
+            else
+            {
+                LoopStatements.Add(cmd);
+            }
             return true;
         }
 

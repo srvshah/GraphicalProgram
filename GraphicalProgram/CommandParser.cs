@@ -17,10 +17,7 @@ namespace GraphicalProgram
             "rectangle", 
             "triangle", 
             "moveto", 
-            "drawto", 
-            "radius",
-            "width",
-            "height",
+            "drawto",
             "var",
             "if",
             "loop",
@@ -28,9 +25,10 @@ namespace GraphicalProgram
         private string command;
         private string[] input;
         private string[] parameters;
-        private Dictionary<string, int> variables = new Dictionary<string, int>();
+        public Dictionary<string, int> variables = new Dictionary<string, int>();
         private string variableKey;
         private string[] comparisonOperators = { "=", ">", "<", ">=", "<=" };
+        private string[] operationOperators = { "+", "-", "*", "/" };
         private string myOperator;
 
         public int X { get; set; }
@@ -47,7 +45,7 @@ namespace GraphicalProgram
 
             command = userInput.Trim().ToLower().Split(' ')[0];
 
-            if (!validCommands.Contains(command))
+            if (!validCommands.Contains(command) && !variables.ContainsKey(command))
             {
                 message = "No such command available";
                 return false;
@@ -276,11 +274,16 @@ namespace GraphicalProgram
 
                 if (!validateInteger()) 
                 {
-                    if (!MapVariablesToParameters(out string error))
+
+                    if (!variables.ContainsKey(parameters[0]))
                     {
-                        message = error;
+                        
+                        message = $"{parameters[0]} is not defined";
                         return false;
+
                     }
+                   
+
                 }
 
                 message = parameters[0];
@@ -301,7 +304,32 @@ namespace GraphicalProgram
 
             }
 
+            else if (variables.ContainsKey(command))
+            {
+                string[] input = userInput.Trim().ToLower().Split(' ');
+                if(!CheckInputLength(input, 3))
+                {
+                    message = "variable operation takes three inputs i.e variable, operator, operand";
+                    return false;
+                }
+                string variable = input[0];
+                string myOperator = input[1]; 
+                string myOperand = input[2]; 
+                if(!myOperator.Equals("=") && !operationOperators.Contains(myOperator))
+                {
+                    message = "invalid operator";
+                    return false;
+                }
 
+                if(!int.TryParse(myOperand, out int _))
+                {
+                    message = "variable operation requires an integer";
+                    return false;
+                }
+
+                parameters = new string[] { variable, myOperator, myOperand };
+
+            }
 
             message = null;
             return true;
@@ -315,60 +343,88 @@ namespace GraphicalProgram
         /// <returns>co-ordinate of the current pen position as a Point</returns>
         public Point executeCommand(Graphics g)
         {
-            Pen p = new Pen(Color.Black);
-            //int[] paramArr = parameters.Select(x => { int.TryParse(x, out int i); return i; }).ToArray();
-            int[] paramArr = parameters.Select(int.Parse).ToArray();
-
-            switch (command)
+            if (variables.ContainsKey(parameters[0]))
             {
+                string variable = parameters[0];
+                string myOperator = parameters[1];
+                string myOperand = parameters[2];
 
-                case "moveto":
-                    moveTo(paramArr[0], paramArr[1]);
-                    break;
-
-                case "drawto":
-                    IShape line = sf.getShape("line");
-                    line.set(X, Y, paramArr[0], paramArr[1]);
-                    line.draw(g);
-                    X = paramArr[0];
-                    Y = paramArr[1];
-                    break;
-
-                case "circle":
-                    IShape circle = sf.getShape("circle");
-                    circle.set(X, Y, paramArr[0]);
-                    circle.draw(g);
-                    break;
-
-                case "rectangle":
-                    IShape rect = sf.getShape("rectangle");
-                    rect.set(X, Y, paramArr[0], paramArr[1]);
-                    rect.draw(g);
-                    X += paramArr[0];
-                    Y += paramArr[1];
-                    break;
-
-                case "triangle":
-                    IShape triangle = sf.getShape("triangle");
-                    triangle.set(X, Y, paramArr[0], paramArr[1], paramArr[2]);
-                    triangle.draw(g);
-                    break;
-                case "var":
-                    // if it exists on the list
-                    if (variables.ContainsKey(variableKey))
-                    {
-                        // replace it
-                        variables[variableKey] = paramArr[0];
-                    }
-                    // if not
-                    else
-                    {
-                        // add it
-                        variables.Add(variableKey, paramArr[0]);
-                    }
-                    break;
+                switch (myOperator)
+                {
+                    case "=":
+                        variables[variable] = int.Parse(myOperand);
+                        break;                                    
+                    case "-":
+                        variables[variable] -= int.Parse(myOperand);
+                        break;                                    
+                    case "+":
+                        variables[variable] += int.Parse(myOperand);
+                        break;                                    
+                    case "*":
+                        variables[variable] *= int.Parse(myOperand);
+                        break;                                    
+                    case "/":
+                        variables[variable] /= int.Parse(myOperand);
+                        break;
+                }
             }
-            p.Dispose();
+            else
+            {
+                Pen p = new Pen(Color.Black);
+                int[] paramArr = parameters.Select(int.Parse).ToArray();
+                switch (command)
+                {
+
+                    case "moveto":
+                        moveTo(paramArr[0], paramArr[1]);
+                        break;
+
+                    case "drawto":
+                        IShape line = sf.getShape("line");
+                        line.set(X, Y, paramArr[0], paramArr[1]);
+                        line.draw(g);
+                        X = paramArr[0];
+                        Y = paramArr[1];
+                        break;
+
+                    case "circle":
+                        IShape circle = sf.getShape("circle");
+                        circle.set(X, Y, paramArr[0]);
+                        circle.draw(g);
+                        break;
+
+                    case "rectangle":
+                        IShape rect = sf.getShape("rectangle");
+                        rect.set(X, Y, paramArr[0], paramArr[1]);
+                        rect.draw(g);
+                        X += paramArr[0];
+                        Y += paramArr[1];
+                        break;
+
+                    case "triangle":
+                        IShape triangle = sf.getShape("triangle");
+                        triangle.set(X, Y, paramArr[0], paramArr[1], paramArr[2]);
+                        triangle.draw(g);
+                        break;
+                    case "var":
+                        // if it exists on the list
+                        if (variables.ContainsKey(variableKey))
+                        {
+                            // replace it
+                            variables[variableKey] = paramArr[0];
+                        }
+                        // if not
+                        else
+                        {
+                            // add it
+                            variables.Add(variableKey, paramArr[0]);
+                        }
+                        break;
+                }
+                p.Dispose();
+            }
+            
+
             return new Point(X, Y);
         }
 
