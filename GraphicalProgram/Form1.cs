@@ -81,13 +81,17 @@ namespace GraphicalProgram
                 string cmd = MultiCommands[i];
 
 
-                if(cmd.Split(' ')[0].Equals("if") || processingIf)
+                if((cmd.Split(' ')[0].ToLower().Equals("if") || processingIf) && !processingLoop)
                 {
                     if(!processIfCommands(cmd)) break;
                 }
-                else if(cmd.Split(' ')[0].Equals("loop") || processingLoop)
+                else if((cmd.Split(' ')[0].ToLower().Equals("loop") || processingLoop) && !processingIf)
                 {
                     if (!processLoopCommands(cmd)) break;
+                }
+                else if(cmd.Split(' ')[0].ToLower().Equals("method"))
+                {
+                    if (!DefineMethod(cmd)) break;
                 }
                 else
                 {
@@ -189,12 +193,30 @@ namespace GraphicalProgram
         string condition = string.Empty;
         private bool processIfCommands(string cmd)
         {
-            if (cmd.StartsWith("if"))
+
+            if(cmd.StartsWith("if") && cmd.Contains("then"))
+            {
+                List<string> stmt = new List<string>();
+                string[] singleLineIf = cmd.Split(new[] { "then" }, StringSplitOptions.None);
+
+                stmt.AddRange(singleLineIf);
+                stmt.Add("endif");
+
+
+                foreach (var item in stmt)
+                {
+                    processIfCommands(item);
+                }
+
+            }
+
+            else if (cmd.StartsWith("if"))
             {
                 processingIf = true;
                 if (!cp.validateCommand(cmd, out condition))
                 {
                     rtxtLogs.Text = $"Error {condition}";
+                    processingIf = false;
                     return false;
                 }
 
@@ -214,6 +236,7 @@ namespace GraphicalProgram
                     if (!string.IsNullOrEmpty(error))
                     {
                         rtxtLogs.Text = $"Error  {error}";
+                        processingIf = false;
                         return false;
                     }
                     else
@@ -237,6 +260,13 @@ namespace GraphicalProgram
                 if (!cp.validateCommand(cmd, out string count))
                 {
                     rtxtLogs.Text = $"Error {count}";
+                    processingLoop = false;
+                    LoopStatements.Clear();
+                    counter = 0;
+                    if (!string.IsNullOrEmpty(counterVariable))
+                    {
+                        cp.variables.Remove(counterVariable);
+                    }
                     return false;
                 }
                 if(!int.TryParse(count, out counter))
@@ -252,29 +282,60 @@ namespace GraphicalProgram
             }
             else if (cmd.StartsWith("endloop"))
             {
-                
+                int forCondition = !string.IsNullOrEmpty(counterVariable) ? cp.variables[counterVariable] : counter;
 
-                for (int i = 0; i < (!string.IsNullOrEmpty(counterVariable) ? cp.variables[counterVariable] : counter); i++)
+                for (int i = 0; i < forCondition; i++)
                 {
+
                     if (!string.IsNullOrEmpty(counterVariable))
                     {
-                        cp.variables[counterVariable]++;
+                        cp.variables[counterVariable] = i+1;
                     }
-                    foreach (var stmt in LoopStatements)
-                    {
-                        string error = processCommands(stmt);
 
-                        if (!string.IsNullOrEmpty(error))
+                    foreach (var stmt in LoopStatements)
+                    //for (int j = 0; j < LoopStatements.Count; j++)
+
+                    {
+                        //string stmt = LoopStatements[j];
+                        if (stmt.StartsWith("if") && stmt.Contains("then"))
                         {
-                            rtxtLogs.Text = $"Error  {error}";
-                            return false;
+                            List<string> str = new List<string>();
+                            string[] singleLineIf = stmt.Split(new[] { "then" }, StringSplitOptions.None);
+
+                            str.AddRange(singleLineIf);
+                            str.Add("endif");
+
+
+                            foreach (var item in str)
+                            {
+                                processIfCommands(item);
+                            }
+
                         }
                         else
                         {
-                            rtxtLogs.Text = string.Empty;
+                            string error = processCommands(stmt);
+                            if (!string.IsNullOrEmpty(error))
+                            {
+                                rtxtLogs.Text = $"Error  {error}";
+                                processingLoop = false;
+                                LoopStatements.Clear();
+                                counter = 0;
+                                if (!string.IsNullOrEmpty(counterVariable))
+                                {
+                                    cp.variables.Remove(counterVariable);
+                                }
+                                return false;
+                            }
+                            else
+                            {
+                                rtxtLogs.Text = string.Empty;
+                            }
                         }
+
                     }
-                    
+
+
                 }
                 processingLoop = false;
                 LoopStatements.Clear();
@@ -288,6 +349,12 @@ namespace GraphicalProgram
             {
                 LoopStatements.Add(cmd);
             }
+            return true;
+        }
+
+        private bool DefineMethod(string cmd)
+        {
+
             return true;
         }
 

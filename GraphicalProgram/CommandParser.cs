@@ -10,7 +10,7 @@ namespace GraphicalProgram
 {
     public class CommandParser
     {
-        ShapeFactory sf = new ShapeFactory();
+        private ShapeFactory sf = new ShapeFactory();
         private string[] validCommands = 
         { 
             "circle", 
@@ -21,6 +21,7 @@ namespace GraphicalProgram
             "var",
             "if",
             "loop",
+            "method"
         };  
         private string command;
         private string[] input;
@@ -107,8 +108,12 @@ namespace GraphicalProgram
                 {
                     if (!validateInteger())
                     {
-                        message = $"Invalid parameter. Use this format: \"{command} x,x,x\" where x is an integer";
-                        return false;
+
+                        if (!MapVariablesToParameters(out string error))
+                        {
+                            message = error;
+                            return false;
+                        }
                     }
 
                 }
@@ -288,19 +293,6 @@ namespace GraphicalProgram
 
                 message = parameters[0];
                 return true;
-                //bool isInt = int.TryParse(cmd.Split(' ')[1], out counter);
-
-                //if (!isInt)
-                //{
-
-                //    Console.WriteLine("requires integer value");
-
-
-                //}
-                //else
-                //{
-                //    insideLoop = true;
-                //}
 
             }
 
@@ -331,6 +323,12 @@ namespace GraphicalProgram
 
             }
 
+            else if (command.Contains("method"))
+            {
+                MessageBox.Show("method ");
+
+            }
+
             message = null;
             return true;
         }
@@ -343,6 +341,8 @@ namespace GraphicalProgram
         /// <returns>co-ordinate of the current pen position as a Point</returns>
         public Point executeCommand(Graphics g)
         {
+            if (parameters == null) return new Point(X,Y);
+
             if (variables.ContainsKey(parameters[0]))
             {
                 string variable = parameters[0];
