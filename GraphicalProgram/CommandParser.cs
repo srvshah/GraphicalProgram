@@ -26,12 +26,13 @@ namespace GraphicalProgram
         private string command;
         private string[] input;
         private string[] parameters;
-        public Dictionary<string, int> variables = new Dictionary<string, int>();
         private string variableKey;
         private string[] comparisonOperators = { "=", ">", "<", ">=", "<=" };
         private string[] operationOperators = { "+", "-", "*", "/" };
         private string myOperator;
 
+        public Dictionary<string, int> variables = new Dictionary<string, int>();
+        public List<Method> DefinedMethods = new List<Method>();
         public int X { get; set; }
         public int Y { get; set; }
 
@@ -258,6 +259,7 @@ namespace GraphicalProgram
 
                
             }
+
             else if (command.Equals("loop"))
             {
 
@@ -325,7 +327,55 @@ namespace GraphicalProgram
 
             else if (command.Contains("method"))
             {
-                MessageBox.Show("method ");
+                string[] input = userInput.Trim().ToLower().Split(' ');
+                if (!CheckInputLength(input, 2))
+                {
+                    message = "Method definition takes two inputs i.e keyword, methodName(<parameters>)";
+                    return false;
+                }
+
+                var mName = input[1].Replace(")", null).Split('(')[0];
+                var parms = input[1].Replace(")", null).Split('(')[1].Split(',');
+
+                if(parms.Distinct().Count() != parms.Count())
+                {
+                    message = "method parameters must be unique";
+                    return false;
+                }
+
+
+                if (string.IsNullOrEmpty(mName))
+                {
+                    message = "method name required";
+                    return false;
+                }
+
+                if(DefinedMethods.Find(x=>x.Name.StartsWith(mName)) != null)
+                {
+                    message = $"The method with the name {mName} is already defined";
+                    return false;
+                }
+
+
+                if (int.TryParse(mName, out _))
+                {
+                    message = "method name must be a string";
+                    return false;
+                }
+
+                if(parms != null && parms.Length != 0)
+                {
+                    foreach (var p in parms)
+                    {
+                        if (int.TryParse(p, out _))
+                        {
+                            message = "method parameter must be a string";
+                            return false;
+                        }
+                    }
+                }
+
+
 
             }
 
@@ -341,7 +391,7 @@ namespace GraphicalProgram
         /// <returns>co-ordinate of the current pen position as a Point</returns>
         public Point executeCommand(Graphics g)
         {
-            if (parameters == null) return new Point(X,Y);
+            if (parameters == null || parameters.Length == 0) return new Point(X,Y);
 
             if (variables.ContainsKey(parameters[0]))
             {

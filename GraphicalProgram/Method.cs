@@ -6,38 +6,26 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgram
 {
-	public class Method
+	public class Method	
 	{
-		private List<string> Commands = new List<string>();
-		private Dictionary<string, int?> Parameters = new Dictionary<string, int?>();
-
+        public Dictionary<string, int?> Parameters { get; private set; } = new Dictionary<string, int?>();
+		public List<string> Commands { get; private set; } = new List<string>();
+		public string Name { get; set; }
+		 
 		public Method() { }
-		public Method(List<string> c, string[] p)
+		public Method(string Name, List<string> c, string[] p)
 		{
+			this.Name = Name;
 			Commands = c;
 			foreach (var item in p)
 			{
 				Parameters.Add(item, null);
 			}
 		}
-		
-		public Method(string[] c)
+		public Method(string Name, List<string> c)
 		{
-			Commands.AddRange(c);
-		}
-
-		public void ExecuteMethod()
-		{
-			Console.WriteLine("Commands");
-			foreach (var item in Commands)
-			{
-				Console.WriteLine(item);
-			}
-			Console.WriteLine("\nParameters");
-			foreach (var item in Parameters)
-			{
-				Console.WriteLine("key: " + item.Key + " value: " + item.Value);
-			}
+			this.Name = Name;
+			Commands = c;
 		}
 	}
 }
