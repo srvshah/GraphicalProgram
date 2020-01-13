@@ -18,11 +18,7 @@ namespace GraphicalProgram
             // for case insensitivity
             shapeType = shapeType.ToUpper().Trim();
 
-            if(shapeType == null)
-            {
-                return null;
-            }
-            else if (shapeType.Equals("LINE"))
+            if (shapeType.Equals("LINE"))
             {
                 return new Line();
             }
@@ -39,10 +35,12 @@ namespace GraphicalProgram
             else if (shapeType.Equals("TRIANGLE"))
             {
                 return new Triangle();
+            }        
+            else if (shapeType.Equals("POLYGON"))
+            {
+                return new Polygon();
             }
             return null;
-
-          
         }
     }
 }

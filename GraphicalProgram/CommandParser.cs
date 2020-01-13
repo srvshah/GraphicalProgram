@@ -11,15 +11,19 @@ namespace GraphicalProgram
     public class CommandParser
     {
         private ShapeFactory sf = new ShapeFactory();
-        private string[] validCommands = 
+        public string[] validCommands = 
         { 
             "circle", 
             "rectangle", 
-            "triangle", 
+            "triangle",
+            "polygon",
             "moveto", 
             "drawto",
             "var",
             "if",
+            "endif",
+            "endloop",
+            "endmethod",
             "loop",
             "method"
         };  
@@ -151,6 +155,37 @@ namespace GraphicalProgram
                         //message = $"Invalid parameter. Use this format: \"{command} x\" where x is an integer";
                         //return false;
                     }
+                }
+            }
+
+            else if (command.Equals("polygon"))
+            {
+                input = userInput.Trim().ToLower().Split(' ');
+                if (!CheckInputLength(input, 2))
+                {
+                    message = $"{command} takes exactly 2 inputs on the same line";
+                    return false;
+                }
+
+                parameters = input[1].Split(',');
+
+                if (parameters.Length < 3)
+                {
+                    message = $"{command} takes minimum 3 parameters";
+                    return false;
+                }
+
+                else
+                {
+                    if (!validateInteger())
+                    {
+                        if (!MapVariablesToParameters(out string error))
+                        {
+                            message = error;
+                            return false;
+                        }
+                    }
+
                 }
             }
 
@@ -431,7 +466,7 @@ namespace GraphicalProgram
 
                     case "drawto":
                         IShape line = sf.getShape("line");
-                        line.set(X, Y, paramArr[0], paramArr[1]);
+                        line.set(X, Y, paramArr);
                         line.draw(g);
                         X = paramArr[0];
                         Y = paramArr[1];
@@ -439,13 +474,13 @@ namespace GraphicalProgram
 
                     case "circle":
                         IShape circle = sf.getShape("circle");
-                        circle.set(X, Y, paramArr[0]);
+                        circle.set(X, Y, paramArr);
                         circle.draw(g);
                         break;
 
                     case "rectangle":
                         IShape rect = sf.getShape("rectangle");
-                        rect.set(X, Y, paramArr[0], paramArr[1]);
+                        rect.set(X, Y, paramArr);
                         rect.draw(g);
                         X += paramArr[0];
                         Y += paramArr[1];
@@ -453,9 +488,16 @@ namespace GraphicalProgram
 
                     case "triangle":
                         IShape triangle = sf.getShape("triangle");
-                        triangle.set(X, Y, paramArr[0], paramArr[1], paramArr[2]);
+                        triangle.set(X, Y, paramArr);
                         triangle.draw(g);
                         break;
+
+                    case "polygon":
+                        IShape polygon = sf.getShape("polygon");
+                        polygon.set(X, Y, paramArr);
+                        polygon.draw(g);
+                        break;
+
                     case "var":
                         // if it exists on the list
                         if (variables.ContainsKey(variableKey))

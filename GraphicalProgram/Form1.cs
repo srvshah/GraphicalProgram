@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,12 +20,24 @@ namespace GraphicalProgram
         bool processingIf = false;
         bool processingLoop = false;
         bool processingMethod = false;
+        string pattern = string.Empty;
+
 
         public Form1()
         {
             InitializeComponent();
             g = panel1.CreateGraphics();
             txtPenPosition.Text = penPosition.ToString();
+
+            pattern += string.Join("|", cp.validCommands);
+            //    var syntaxHighlighter = new SyntaHighlighter
+
+            //    syntaxHighlighter.AddPattern(new PatternDefinition("circle", "triangle", "int", "var"), new SyntaxStyle(Color.Blue));
+            //    syntaxHighlighter.AddPattern(new PatternDefinition("rectangle", "3drectangle", "int", "var"), new SyntaxStyle(Color.Purple));
+            //    syntaxHighlighter.AddPattern(new PatternDefinition("loop", "endloop", "int", "var"), new SyntaxStyle(Color.Green));
+            //    syntaxHighlighter.AddPattern(new PatternDefinition("radius", "height", "width", "var"), new SyntaxStyle(Color.Maroon));
+            //    syntaxHighlighter.AddPattern(new PatternDefinition("counter"), new SyntaxStyle(Color.DarkOrange));
+            //
         }
 
 
@@ -39,7 +52,6 @@ namespace GraphicalProgram
             penPosition = cp.resetPen();
             txtPenPosition.Text = penPosition.ToString();
         }
-
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -57,9 +69,6 @@ namespace GraphicalProgram
                     }
                 }
             }
-
-
-
         }
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -78,7 +87,6 @@ namespace GraphicalProgram
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             DialogResult dialog = MessageBox.Show("Do you want to close?", "Alert!", MessageBoxButtons.YesNo);
 
             if (dialog == DialogResult.Yes)
@@ -94,22 +102,14 @@ namespace GraphicalProgram
 
         private void btnRun_Click(object sender, EventArgs e)
         {
+
             if (string.IsNullOrEmpty(txtCommand.Text))
             {
                 rtxtLogs.Text = "Command field is empty!";
                 return;
             }
 
-            string error = processCommands(txtCommand.Text);
-
-            if (!string.IsNullOrEmpty(error))
-            {
-                rtxtLogs.Text = error;
-            }
-            else
-            {
-                rtxtLogs.Text = string.Empty;
-            }
+            FilterAndExecute(txtCommand.Text, 0);
             txtPenPosition.Text = penPosition.ToString();
         }
 
@@ -125,7 +125,6 @@ namespace GraphicalProgram
         private void btnExecute_Click(object sender, EventArgs e)
         {
             List<string> MultiCommands = new List<string>();
-            
 
             foreach (var command in txtMultiCommand.Lines)
             {
@@ -142,7 +141,6 @@ namespace GraphicalProgram
                 rtxtLogs.Text = "Nothing to execute";
                 return;
             }
-
            
             for (int i = 0; i < lineCount; i++)
             {
@@ -182,7 +180,7 @@ namespace GraphicalProgram
 
                 if (inputHasParamaters() && parameters != null)
                 {
-
+                    arr = arr.Where(x => !string.IsNullOrEmpty(x)).ToArray(); 
                     if (arr.Length != parameters.Count())
                     {
                         rtxtLogs.Text = $"{method.Name} takes {parameters.Count()} arguments";
@@ -464,6 +462,41 @@ namespace GraphicalProgram
 
             }
             return true;
+        }
+
+
+        private void txtMultiCommand_TextChanged(object sender, EventArgs e)
+        {
+
+
+            
+            
+            Regex regex = new Regex($@"\b({pattern})\b", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            int index = txtMultiCommand.SelectionStart;
+
+           
+            foreach (Match m in regex.Matches(txtMultiCommand.Text))
+            {
+                txtMultiCommand.Select(m.Index, m.Value.Length);
+                txtMultiCommand.SelectionColor = Color.Blue;
+                txtMultiCommand.SelectionStart = index;
+            }
+            txtMultiCommand.SelectionColor = Color.Black;
+
+
+            //Regex R = new Regex(@"\b"+pattern+@"\b", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+            //int index = txtMultiCommand.SelectionStart;
+
+            //foreach (Match m in Regex.Matches(txtMultiCommand.Text, $@"\b({pattern})\b", RegexOptions.Singleline | RegexOptions.IgnoreCase))
+            //{
+            //    txtMultiCommand.Select(m.Index, m.Value.Length);
+            //    txtMultiCommand.SelectionColor = Color.Blue;
+            //    txtMultiCommand.SelectionStart = index;
+
+            //}
+
+            //txtMultiCommand.SelectionColor = Color.Black;
         }
 
     }

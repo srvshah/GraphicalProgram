@@ -28,11 +28,11 @@ namespace GraphicalProgram
         /// takes integer array as argument, sets the provided arguments to the variables
         /// </summary>
         /// <param name="list"></param>
-        public void set(params int[] list)
+        public void set(int x, int y, params int[] list)
         {
-            X = list[0];
-            Y = list[1];
-            Radius = list[2];
+            X = x;
+            Y = y;
+            Radius = list[0];
         }
 
      

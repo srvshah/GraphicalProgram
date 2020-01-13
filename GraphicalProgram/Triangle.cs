@@ -28,22 +28,22 @@ namespace GraphicalProgram
         /// sets the parameter 
         /// </summary>
         /// <param name="list"></param>
-        public void set(params int[] list)
+        public void set(int x, int y, params int[] list)
         {
-            X = list[0];
-            Y = list[1];
+            X = x;
+            Y = y;
 
             // adding y to first point
             point[0].X = X;
-            point[0].Y = Y + list[2];
+            point[0].Y = Y + list[0];
 
             // adding x to second point
-            point[1].X = X + list[3];
+            point[1].X = X + list[1];
             point[1].Y = Y;
 
             // adding x and y to third point
-            point[2].X = X + list[3];
-            point[2].Y = Y + list[4];
+            point[2].X = X + list[1];
+            point[2].Y = Y + list[2];
             
         }
     }

@@ -10,6 +10,6 @@ namespace GraphicalProgram
     interface IShape
     {
         void draw(Graphics g);
-        void set(params int[] list);
+        void set(int x, int y, params int[] list);
     }
 }

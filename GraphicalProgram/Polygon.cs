@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgram
 {
-    public class Rectangle : IShape
+    class Polygon : IShape
     {
         public int X { get; set; }
         public int Y { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
+        public List<Point> points = new List<Point>();
 
         /// <summary>
         /// Draws rectangle
@@ -21,7 +20,12 @@ namespace GraphicalProgram
         public void draw(Graphics g)
         {
             Pen p = new Pen(Color.Black);
-            g.DrawRectangle(p, X, Y, Width, Height);
+
+
+            Point[] ps = new Point[] { new Point(30, 50), new Point(120, 200), new Point(60,300) };
+
+
+            g.DrawPolygon(p, points.ToArray());
             p.Dispose();
         }
 
@@ -33,8 +37,27 @@ namespace GraphicalProgram
         {
             X = x;
             Y = y;
-            Width = list[0];
-            Height = list[1];
+
+            for (int i = 0; i < list.Length; i++)
+            {
+                int a = list[i];
+                int b = list[i];
+
+                if (i % 2 == 0)
+                {
+                    a *= 2;
+                    b *= 3;
+                }
+                else
+                {
+                    a *= 3;
+                    b *= 2;
+                }
+               
+                points.Add(new Point(a, b));
+            }
+
         }
+
     }
 }
