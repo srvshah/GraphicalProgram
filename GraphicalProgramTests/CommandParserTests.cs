@@ -15,7 +15,7 @@ namespace GraphicalProgram.Tests
     [TestClass()]
     public class CommandParserTests
     {
-        CommandParser cp = new CommandParser();
+        CommandParser cp = CommandParser.Instance;
         Form1 form = new Form1();
 
         /// <summary>

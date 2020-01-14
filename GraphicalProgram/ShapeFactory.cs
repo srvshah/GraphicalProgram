@@ -8,6 +8,24 @@ namespace GraphicalProgram
 {
     class ShapeFactory
     {
+        #region Singleton
+        private ShapeFactory() { }
+
+        private static ShapeFactory instance;
+
+        public static ShapeFactory Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new ShapeFactory();
+                }
+                return instance;
+            }
+        }
+        #endregion
+
         /// <summary>
         /// returns an object of Shape type according to user input
         /// </summary>
@@ -20,25 +38,25 @@ namespace GraphicalProgram
 
             if (shapeType.Equals("LINE"))
             {
-                return new Line();
+                return Line.Instance;
             }
             else if (shapeType.Equals("CIRCLE"))
             {
-                return new Circle();
+                return Circle.Instance;
 
             }
             else if (shapeType.Equals("RECTANGLE"))
             {
-                return new Rectangle();
+                return Rectangle.Instance;
 
             }       
             else if (shapeType.Equals("TRIANGLE"))
             {
-                return new Triangle();
+                return Triangle.Instance;
             }        
             else if (shapeType.Equals("POLYGON"))
             {
-                return new Polygon();
+                return Polygon.Instance;
             }
             return null;
         }

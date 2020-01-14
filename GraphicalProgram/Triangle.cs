@@ -9,6 +9,25 @@ namespace GraphicalProgram
 {
     public class Triangle : IShape
     {
+
+        #region Singleton
+        private Triangle() { }
+
+        private static Triangle instance;
+
+        public static Triangle Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Triangle();
+                }
+                return instance;
+            }
+        }
+        #endregion
+
         public int X { get; set; }
         public int Y { get; set; }
         public Point[] point = new Point[3];

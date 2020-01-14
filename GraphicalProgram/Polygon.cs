@@ -7,8 +7,26 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgram
 {
-    class Polygon : IShape
+    public class Polygon : IShape
     {
+        #region Singleton
+        private Polygon() { }
+
+        private static Polygon instance;
+
+        public static Polygon Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Polygon();
+                }
+                return instance;
+            }
+        }
+        #endregion
+
         public int X { get; set; }
         public int Y { get; set; }
         public List<Point> points = new List<Point>();

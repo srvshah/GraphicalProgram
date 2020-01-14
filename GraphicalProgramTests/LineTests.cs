@@ -14,7 +14,7 @@ namespace GraphicalProgram.Tests
     [TestClass()]
     public class LineTests
     {
-        Line ln = new Line();
+        Line ln = Line.Instance;
 
         /// <summary>
         /// Tests whether the value passed to the set method sets the variables to the given value

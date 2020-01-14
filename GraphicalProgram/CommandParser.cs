@@ -8,9 +8,30 @@ using System.Windows.Forms;
 
 namespace GraphicalProgram
 {
+    /// <summary>
+    /// Takes the given command checks its validity and executes commands
+    /// </summary>
     public class CommandParser
     {
-        private ShapeFactory sf = new ShapeFactory();
+        #region Singleton
+        private CommandParser() { }
+
+        private static CommandParser instance;
+
+        public static CommandParser Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new CommandParser();
+                }
+                return instance;
+            }
+        }
+        #endregion
+
+        #region Instance Variables
         public string[] validCommands = 
         { 
             "circle", 
@@ -25,7 +46,8 @@ namespace GraphicalProgram
             "endloop",
             "endmethod",
             "loop",
-            "method"
+            "method" ,
+            "then"
         };  
         private string command;
         private string[] input;
@@ -39,6 +61,7 @@ namespace GraphicalProgram
         public List<Method> DefinedMethods = new List<Method>();
         public int X { get; set; }
         public int Y { get; set; }
+        #endregion
 
         /// <summary>
         /// takes a string, checks if it is a valid command
@@ -79,16 +102,12 @@ namespace GraphicalProgram
                 {
                     if (!validateInteger())
                     {
-
                         if (!MapVariablesToParameters(out string error))
                         {
                             message = error;
                             return false;
                         }
-                        //message = $"Invalid parameter. Use this format: \"{command} x,x\" where x is an integer";
-                        //return false;
                     }
-
                 }
             }
 
@@ -113,7 +132,6 @@ namespace GraphicalProgram
                 {
                     if (!validateInteger())
                     {
-
                         if (!MapVariablesToParameters(out string error))
                         {
                             message = error;
@@ -134,7 +152,6 @@ namespace GraphicalProgram
                 }
 
                 parameters = input[1].Split(',');
-
 
                 if (parameters.Length != 1)
                 {
@@ -316,16 +333,11 @@ namespace GraphicalProgram
 
                 if (!validateInteger()) 
                 {
-
                     if (!variables.ContainsKey(parameters[0]))
                     {
-                        
                         message = $"{parameters[0]} is not defined";
                         return false;
-
                     }
-                   
-
                 }
 
                 message = parameters[0];
@@ -378,7 +390,6 @@ namespace GraphicalProgram
                     return false;
                 }
 
-
                 if (string.IsNullOrEmpty(mName))
                 {
                     message = "method name required";
@@ -409,15 +420,11 @@ namespace GraphicalProgram
                         }
                     }
                 }
-
-
-
             }
 
             message = null;
             return true;
         }
-
 
         /// <summary>
         /// executes what is stored in the command variable using the parameters stored in parameters array
@@ -459,13 +466,12 @@ namespace GraphicalProgram
                 int[] paramArr = parameters.Select(int.Parse).ToArray();
                 switch (command)
                 {
-
                     case "moveto":
                         moveTo(paramArr[0], paramArr[1]);
                         break;
 
                     case "drawto":
-                        IShape line = sf.getShape("line");
+                        IShape line = ShapeFactory.Instance.getShape("line");
                         line.set(X, Y, paramArr);
                         line.draw(g);
                         X = paramArr[0];
@@ -473,13 +479,13 @@ namespace GraphicalProgram
                         break;
 
                     case "circle":
-                        IShape circle = sf.getShape("circle");
+                        IShape circle = ShapeFactory.Instance.getShape("circle");
                         circle.set(X, Y, paramArr);
                         circle.draw(g);
                         break;
 
                     case "rectangle":
-                        IShape rect = sf.getShape("rectangle");
+                        IShape rect = ShapeFactory.Instance.getShape("rectangle");
                         rect.set(X, Y, paramArr);
                         rect.draw(g);
                         X += paramArr[0];
@@ -487,13 +493,13 @@ namespace GraphicalProgram
                         break;
 
                     case "triangle":
-                        IShape triangle = sf.getShape("triangle");
+                        IShape triangle = ShapeFactory.Instance.getShape("triangle");
                         triangle.set(X, Y, paramArr);
                         triangle.draw(g);
                         break;
 
                     case "polygon":
-                        IShape polygon = sf.getShape("polygon");
+                        IShape polygon = ShapeFactory.Instance.getShape("polygon");
                         polygon.set(X, Y, paramArr);
                         polygon.draw(g);
                         break;
@@ -515,8 +521,6 @@ namespace GraphicalProgram
                 }
                 p.Dispose();
             }
-            
-
             return new Point(X, Y);
         }
 
@@ -535,7 +539,6 @@ namespace GraphicalProgram
             Y = y;
         }
 
-
         /// <summary>
         /// iterates through parameters array and checks if they are integers
         /// </summary>
@@ -552,11 +555,23 @@ namespace GraphicalProgram
             return true;
         }
 
+        /// <summary>
+        /// compares the length of the given array with the required length of array
+        /// </summary>
+        /// <param name="arr"></param>
+        /// <param name="requiredLength"></param>
+        /// <returns></returns>
         public bool CheckInputLength(string[] arr, int requiredLength)
         {
             return arr.Length == requiredLength;
         }
 
+        /// <summary>
+        /// if parameters array contain a string that has a value in variable dictionary, it is 
+        /// swapped with that value
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         private bool MapVariablesToParameters(out string message)
         {
             for (int i = 0; i < parameters.Length; i++)

@@ -9,6 +9,24 @@ namespace GraphicalProgram
 {
     public class Line : IShape
     {
+        #region Singleton
+        private Line() { }
+
+        private static Line instance;
+
+        public static Line Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Line();
+                }
+                return instance;
+            }
+        }
+        #endregion
+
         public int X { get; set; }
         public int Y { get; set; }
         public int toX { get; set; }

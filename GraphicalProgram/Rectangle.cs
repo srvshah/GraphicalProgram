@@ -9,6 +9,24 @@ namespace GraphicalProgram
 {
     public class Rectangle : IShape
     {
+        #region Singleton
+        private Rectangle() { }
+
+        private static Rectangle instance;
+
+        public static Rectangle Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Rectangle();
+                }
+                return instance;
+            }
+        }
+        #endregion
+
         public int X { get; set; }
         public int Y { get; set; }
         public int Width { get; set; }

@@ -6,13 +6,34 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgram
 {
+	/// <summary>
+	/// Method Class for defining methods, has two overloaded constructors with one default one
+	/// takes list of commands, array of parameters (optional), method name
+	/// </summary>
 	public class Method	
 	{
-        public Dictionary<string, int?> Parameters { get; private set; } = new Dictionary<string, int?>();
+		#region Singleton
+		private Method() { }
+
+		private static Method instance;
+
+		public static Method Instance
+		{
+			get
+			{
+				if (instance == null)
+				{
+					instance = new Method();
+				}
+				return instance;
+			}
+		}
+		#endregion
+		public Dictionary<string, int?> Parameters { get; private set; } = new Dictionary<string, int?>();
 		public List<string> Commands { get; private set; } = new List<string>();
 		public string Name { get; set; }
 		 
-		public Method() { }
+		//public Method() { }
 		public Method(string Name, List<string> c, string[] p)
 		{
 			this.Name = Name;

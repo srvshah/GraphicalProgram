@@ -9,6 +9,24 @@ namespace GraphicalProgram
 {
     public class Circle : IShape
     {
+        #region Singleton
+        private Circle() { }
+
+        private static Circle instance;
+
+        public static Circle Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Circle();
+                }
+                return instance;
+            }
+        }
+        #endregion
+
         public int Radius { get; set; }
         public int X { get; set; }
         public int Y { get; set; }      

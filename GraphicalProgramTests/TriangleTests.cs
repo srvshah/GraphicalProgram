@@ -15,7 +15,7 @@ namespace GraphicalProgram.Tests
     [TestClass()]
     public class TriangleTests
     {
-        Triangle t = new Triangle();
+        Triangle t = Triangle.Instance;
 
         /// <summary>
         /// Tests whether the value passed to the set method sets the variables to the given value

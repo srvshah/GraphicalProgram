@@ -14,7 +14,7 @@ namespace GraphicalProgram.Tests
     [TestClass()]
     public class CircleTests
     {
-        Circle c = new Circle();
+        Circle c = Circle.Instance;
 
         /// <summary>
         /// Tests whether the value passed to the set method sets the variables to the given value

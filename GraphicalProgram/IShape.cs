@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace GraphicalProgram
 {
+    /// <summary>
+    /// Interface inherited by all types of shapes
+    /// </summary>
     interface IShape
     {
         void draw(Graphics g);

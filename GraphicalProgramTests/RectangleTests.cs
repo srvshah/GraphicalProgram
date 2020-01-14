@@ -14,7 +14,7 @@ namespace GraphicalProgram.Tests
     [TestClass()]
     public class RectangleTests
     {
-        Rectangle r = new Rectangle();
+        Rectangle r = Rectangle.Instance;
 
         /// <summary>
         /// Tests whether the value passed to the set method sets the variables to the given value
